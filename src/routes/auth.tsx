@@ -12,9 +12,9 @@ import { safeRedirect } from "@/lib/finance";
 type Mode = "signin" | "signup" | "forgot";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>): { mode?: Mode; redirect?: string } => ({
-    mode: s.mode === "signup" || s.mode === "forgot" ? s.mode : undefined,
-    redirect: typeof s.redirect === "string" ? s.redirect : undefined,
+  validateSearch: (s: Record<string, unknown>): { mode?: Mode | undefined; redirect?: string | undefined } => ({
+    mode: s["mode"] === "signup" || s["mode"] === "forgot" ? s["mode"] : undefined,
+    redirect: typeof s["redirect"] === "string" ? s["redirect"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -48,7 +48,7 @@ function AuthPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setNotice("");
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Enter a valid email.");
+    if (!/^\S+@\S+\.\S+$/.test(email)) { toast.error("Enter a valid email."); return; }
     setBusy(true);
     try {
       if (mode === "forgot") {

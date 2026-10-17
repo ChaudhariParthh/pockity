@@ -23,7 +23,7 @@ function SettingsPage() {
   const { user } = Route.useRouteContext();
   const router = useRouter();
   const signOut = useSignOut();
-  const [name, setName] = useState((user.user_metadata?.full_name as string) ?? "");
+  const [name, setName] = useState((user.user_metadata?.["full_name"] as string) ?? "");
   const [current, setCurrent] = useState("");
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,16 +32,16 @@ function SettingsPage() {
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ data: { full_name: name.trim().slice(0, 60) } });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Name updated");
     router.invalidate();
   };
   const savePw = async () => {
-    if (pw.length < 8) return toast.error("Password must be at least 8 characters.");
+    if (pw.length < 8) { toast.error("Password must be at least 8 characters."); return; }
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw, current_password: current } as Parameters<typeof supabase.auth.updateUser>[0]);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setPw(""); setCurrent("");
     toast.success("Password changed");
   };

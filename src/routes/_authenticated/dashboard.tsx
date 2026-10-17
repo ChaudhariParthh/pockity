@@ -45,7 +45,7 @@ function Dashboard() {
     return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
   }, [monthTxns, statTab]);
   const breakdownTotal = breakdown.reduce((a, b) => a + b.value, 0);
-  const first = ((user.user_metadata?.full_name as string | undefined) ?? user.email ?? "").split(/[\s@]/)[0];
+  const first = ((user.user_metadata?.["full_name"] as string | undefined) ?? user.email ?? "").split(/[\s@]/)[0];
   const hour = new Date().getHours();
   const greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
