@@ -7,7 +7,6 @@ import {
   Utensils, Bus, ShoppingBag, Receipt, Film, Home, Briefcase, Laptop, Sparkles, PanelLeft,
 } from "lucide-react";
 import { toast } from "sonner";
-import logoAsset from "@/assets/pockity-logo.png.asset.json";
 import logoWhite from "@/assets/pockity-logo-white.png";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
