@@ -17,7 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pockity — Personal finance dashboard" },
+      { title: "Pockity" },
       { name: "description", content: "Track income, expenses and monthly cash flow in ₹ with Pockity." },
       { property: "og:title", content: "Pockity — Personal finance dashboard" },
       { property: "og:description", content: "Track income, expenses and monthly cash flow in ₹ with Pockity." },
