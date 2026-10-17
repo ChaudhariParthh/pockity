@@ -27,7 +27,7 @@ export function useSignOut() {
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
   const { user } = useRouteContext({ from: "/_authenticated" });
   const signOut = useSignOut();
-  const name = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "You";
+  const name = (user.user_metadata?.["full_name"] as string | undefined) ?? user.email ?? "You";
   const initials = name.split(/[\s@]/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
 
   return (
