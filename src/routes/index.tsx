@@ -8,8 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import logoAsset from "@/assets/pockity-logo.png.asset.json";
-import iconAsset from "@/assets/pockity-icon.png.asset.json";
-import wordAsset from "@/assets/pockity-wordmark.png.asset.json";
+import logoWhite from "@/assets/pockity-logo-white.png";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -235,7 +234,7 @@ function Dashboard() {
       {splash && (
         <div role="status" aria-label="Welcome to Pockity" onClick={() => setSplash(false)} className="fixed inset-0 z-50 grid place-items-center bg-brand-dark animate-in fade-in">
           <div className="text-center">
-            <img src={logoAsset.url} alt="Pockity" className="mx-auto w-72 animate-in zoom-in-95 duration-700" />
+            <img src={logoWhite} alt="Pockity" className="mx-auto w-72 animate-in zoom-in-95 duration-700" />
             <p className="mt-2 text-sm text-brand-dark-foreground">Your money, in your pocket.</p>
           </div>
         </div>
@@ -272,8 +271,7 @@ function Sidebar() {
   return (
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar lg:flex">
       <div className="m-3 flex h-14 items-center gap-2 rounded-xl bg-brand-dark px-3">
-        <img src={iconAsset.url} alt="" className="h-9 w-9 rounded-lg" />
-        <img src={wordAsset.url} alt="Pockity" className="h-6 w-auto" />
+        <img src={logoWhite} alt="Pockity" className="h-8 w-auto" />
         <PanelLeft className="ml-auto h-4 w-4 text-brand-dark-foreground" />
       </div>
       <nav className="flex-1 space-y-5 px-3 py-4">
