@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell } from "recharts";
 import {
   LayoutDashboard, ArrowLeftRight, BarChart3, Wallet, CalendarRange, FileText, Settings, HelpCircle, LogOut,
@@ -7,6 +7,9 @@ import {
   Utensils, Bus, ShoppingBag, Receipt, Film, Home, Briefcase, Laptop, Sparkles, PanelLeft,
 } from "lucide-react";
 import { toast } from "sonner";
+import logoAsset from "@/assets/pockity-logo.png.asset.json";
+import iconAsset from "@/assets/pockity-icon.png.asset.json";
+import wordAsset from "@/assets/pockity-wordmark.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -17,7 +20,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pockity — Personal finance dashboard" },
+      { title: "Pockity" },
       { name: "description", content: "Track income, expenses and monthly cash flow in ₹ with Pockity." },
       { property: "og:title", content: "Pockity — Personal finance dashboard" },
       { property: "og:description", content: "Track income, expenses and monthly cash flow in ₹ with Pockity." },
@@ -65,6 +68,8 @@ function Dashboard() {
   const [open, setOpen] = useState(false);
   const [statTab, setStatTab] = useState<"income" | "expense">("expense");
   const [query, setQuery] = useState("");
+  const [splash, setSplash] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setSplash(false), 1800); return () => clearTimeout(t); }, []);
 
   const income = txns.filter((t) => t.type === "income").reduce((a, t) => a + t.amount, 0);
   const expense = txns.filter((t) => t.type === "expense").reduce((a, t) => a + t.amount, 0);
@@ -227,6 +232,15 @@ function Dashboard() {
         </main>
       </div>
 
+      {splash && (
+        <div role="status" aria-label="Welcome to Pockity" onClick={() => setSplash(false)} className="fixed inset-0 z-50 grid place-items-center bg-brand-dark animate-in fade-in">
+          <div className="text-center">
+            <img src={logoAsset.url} alt="Pockity" className="mx-auto w-72 animate-in zoom-in-95 duration-700" />
+            <p className="mt-2 text-sm text-brand-dark-foreground">Your money, in your pocket.</p>
+          </div>
+        </div>
+      )}
+
       <AddDialog open={open} onOpenChange={setOpen} onAdd={(t) => { setTxns((x) => [t, ...x]); toast.success("Transaction added"); }} />
     </div>
   );
@@ -257,10 +271,10 @@ function Sidebar() {
   ] as const;
   return (
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar lg:flex">
-      <div className="flex h-16 items-center gap-2 px-5">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary font-extrabold text-primary-foreground">P</span>
-        <span className="text-lg font-bold">Pockity</span>
-        <PanelLeft className="ml-auto h-4 w-4 text-muted-foreground" />
+      <div className="m-3 flex h-14 items-center gap-2 rounded-xl bg-brand-dark px-3">
+        <img src={iconAsset.url} alt="" className="h-9 w-9 rounded-lg" />
+        <img src={wordAsset.url} alt="Pockity" className="h-6 w-auto" />
+        <PanelLeft className="ml-auto h-4 w-4 text-brand-dark-foreground" />
       </div>
       <nav className="flex-1 space-y-5 px-3 py-4">
         {groups.map((g) => (

@@ -53,6 +53,8 @@
   --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-success: var(--success);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-dark-foreground: var(--brand-dark-foreground);
   --color-primary-soft: var(--primary-soft);
   --color-primary-glow: var(--primary-glow);
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
@@ -87,6 +89,8 @@
   --destructive: oklch(0.6 0.22 20);
   --destructive-foreground: oklch(0.99 0 0);
   --success: oklch(0.7 0.15 165);
+  --brand-dark: oklch(0.16 0.02 165);
+  --brand-dark-foreground: oklch(0.75 0.03 165);
   --border: oklch(0.92 0.01 270);
   --input: oklch(0.92 0.01 270);
   --ring: oklch(0.42 0.24 272);
