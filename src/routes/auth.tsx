@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import logoWhite from "@/assets/pockity-logo-white.png";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,12 +34,14 @@ function AuthPage() {
   const [mode, setMode] = useState<Mode>(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const dest = safeRedirect(search.redirect);
 
   useEffect(() => {
+    setConfirm("");
     const go = () => navigate({ to: dest, replace: true });
     supabase.auth.getSession().then(({ data }) => data.session && go());
     const { data } = supabase.auth.onAuthStateChange((e, s) => { if (e === "SIGNED_IN" && s) go(); });
@@ -57,6 +60,7 @@ function AuthPage() {
         setNotice("If an account exists, a reset link is on its way to your inbox.");
       } else if (mode === "signup") {
         if (password.length < 8) throw new Error("Password must be at least 8 characters.");
+        if (password !== confirm) throw new Error("Passwords don't match. Please retype it.");
         const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/dashboard", data: { full_name: name.trim().slice(0, 60) } } });
         if (error) throw error;
         setNotice("Check your email to confirm your account, then sign in.");
@@ -91,7 +95,8 @@ function AuthPage() {
           <form onSubmit={submit} className={`grid gap-3 ${mode === "forgot" ? "mt-5" : ""}`}>
             {mode === "signup" && <div className="grid gap-1.5"><Label htmlFor="name">Name</Label><Input id="name" maxLength={60} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></div>}
             <div className="grid gap-1.5"><Label htmlFor="email">Email</Label><Input id="email" type="email" required maxLength={255} value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></div>
-            {mode !== "forgot" && <div className="grid gap-1.5"><Label htmlFor="pw">Password</Label><Input id="pw" type="password" required minLength={mode === "signup" ? 8 : undefined} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>}
+            {mode !== "forgot" && <div className="grid gap-1.5"><Label htmlFor="pw">Password</Label><PasswordInput id="pw" required minLength={mode === "signup" ? 8 : undefined} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>}
+            {mode === "signup" && <div className="grid gap-1.5"><Label htmlFor="pw-confirm">Retype password</Label><PasswordInput id="pw-confirm" required value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" /></div>}
             {notice && <p className="rounded-lg bg-muted p-3 text-sm">{notice}</p>}
             <Button type="submit" disabled={busy}>{busy ? "Please wait…" : mode === "signup" ? "Create account" : mode === "forgot" ? "Send reset link" : "Sign in"}</Button>
           </form>
