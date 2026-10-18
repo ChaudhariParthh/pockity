@@ -4,6 +4,7 @@ import { LayoutDashboard, ArrowLeftRight, BarChart3, Settings, LogOut, Sparkles,
 import { useTheme } from "@/lib/theme";
 import type { ReactNode } from "react";
 import logoWhite from "@/assets/pockity-logo-white.png";
+import logoAsset from "@/assets/pockity-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -35,8 +36,8 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   return (
     <div className="flex min-h-screen bg-background font-sans text-foreground">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar lg:flex">
-        <Link to="/dashboard" className="m-3 flex h-14 items-center rounded-xl bg-brand-dark px-3" aria-label="Pockity home">
-          <img src={logoWhite} alt="Pockity" className="h-8 w-auto" />
+        <Link to="/dashboard" className="m-3 flex h-16 items-center px-2" aria-label="Pockity home">
+          <img src={theme === "dark" ? logoWhite : logoAsset.url} alt="Pockity" className="h-12 w-auto" />
         </Link>
         <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Main">
           {NAV.map(({ to, label, icon: Icon }) => (
