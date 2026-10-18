@@ -1,6 +1,7 @@
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, ArrowLeftRight, BarChart3, Settings, LogOut, Sparkles } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, BarChart3, Settings, LogOut, Sparkles, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/lib/theme";
 import type { ReactNode } from "react";
 import logoWhite from "@/assets/pockity-logo-white.png";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ export function useSignOut() {
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
   const { user } = useRouteContext({ from: "/_authenticated" });
   const signOut = useSignOut();
+  const { theme, toggle } = useTheme();
   const name = (user.user_metadata?.["full_name"] as string | undefined) ?? user.email ?? "You";
   const initials = name.split(/[\s@]/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
 
@@ -57,7 +59,12 @@ export function AppShell({ title, actions, children }: { title: string; actions?
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 items-center gap-3 border-b bg-card px-6">
           <h1 className="text-base font-semibold">{title}</h1>
-          <div className="ml-auto flex items-center gap-2">{actions}</div>
+          <div className="ml-auto flex items-center gap-2">
+            {actions}
+            <Button variant="ghost" size="icon" onClick={toggle} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+          </div>
           <Link to="/settings" aria-label="Account settings" className="grid h-9 w-9 place-items-center rounded-full bg-gradient-primary text-sm font-semibold text-primary-foreground">{initials}</Link>
         </header>
         <nav className="flex gap-1 overflow-x-auto border-b bg-card px-4 py-2 lg:hidden" aria-label="Main mobile">
