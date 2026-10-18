@@ -91,7 +91,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" },
-      { rel: "icon", type: "image/png", href: "/favicon.png?v=2" },
+      { rel: "icon", type: "image/png", href: "/favicon.png?v=3" },
+    ],
+    scripts: [
+      {
+        children:
+          "try{var t=localStorage.getItem('pockity-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}",
+      },
     ],
   }),
   shellComponent: RootShell,

@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Plus, Download, Search, Trash2, Receipt } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, Download, Search, Trash2, Receipt, MoreHorizontal, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AppShell, Card } from "@/components/AppShell";
 import { AddDialog } from "@/components/AddDialog";
-import { ICONS, fmtDate, inr, txnsQuery, useDeleteTxn } from "@/lib/finance";
+import { EditDialog } from "@/components/EditDialog";
+import { ICONS, fmtDate, inr, txnsQuery, useDeleteTxn, type Txn } from "@/lib/finance";
 import { exportCsv } from "./dashboard";
 
 export const Route = createFileRoute("/_authenticated/transactions")({
@@ -25,9 +27,13 @@ export const Route = createFileRoute("/_authenticated/transactions")({
 function Transactions() {
   const { data: txns } = useSuspenseQuery(txnsQuery);
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Txn | null>(null);
   const [query, setQuery] = useState("");
   const del = useDeleteTxn();
-  const visible = txns.filter((t) => `${t.description} ${t.category}`.toLowerCase().includes(query.toLowerCase()));
+  const visible = useMemo(() => {
+    const q = query.toLowerCase();
+    return txns.filter((t) => `${t.description} ${t.category}`.toLowerCase().includes(q));
+  }, [txns, query]);
 
   return (
     <AppShell title="Transactions" actions={
@@ -54,10 +60,18 @@ function Transactions() {
                     <td className="text-muted-foreground">{t.category}</td>
                     <td className={`text-right font-semibold num ${t.type === "income" ? "text-success" : ""}`}>{t.type === "income" ? "+" : "−"}{inr(t.amount)}</td>
                     <td className="w-10 text-right">
-                      <Button variant="ghost" size="icon" aria-label={`Delete ${t.description}`} onClick={() => {
-                        if (!confirm(`Delete "${t.description}"?`)) return;
-                        del.mutate(t.id, { onSuccess: () => toast.success("Deleted"), onError: () => toast.error("Couldn't delete") });
-                      }}><Trash2 className="h-4 w-4" /></Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" aria-label={`Options for ${t.description}`}><MoreHorizontal className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditing(t)}><Pencil className="h-4 w-4" /> Edit</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => {
+                            if (!confirm(`Delete "${t.description}"?`)) return;
+                            del.mutate(t.id, { onSuccess: () => toast.success("Deleted"), onError: () => toast.error("Couldn't delete") });
+                          }}><Trash2 className="h-4 w-4" /> Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 );
@@ -68,6 +82,7 @@ function Transactions() {
         </div>
       </Card>
       <AddDialog open={open} onOpenChange={setOpen} />
+      <EditDialog txn={editing} onClose={() => setEditing(null)} />
     </AppShell>
   );
 }
