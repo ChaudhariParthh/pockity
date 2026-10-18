@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Share2 } from "lucide-react";
 import { AppShell, Card, useSignOut } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -62,6 +63,23 @@ function SettingsPage() {
           <div className="grid gap-1.5"><Label htmlFor="p">New password</Label><Input id="p" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></div>
         </div>
         <Button className="mt-3" onClick={savePw} disabled={busy}>Update password</Button>
+      </Card>
+      <Card className="max-w-lg">
+        <p className="font-semibold">Share Pockity</p>
+        <p className="text-sm text-muted-foreground">Invite friends to track their money with you.</p>
+        <Button variant="outline" className="mt-3" onClick={async () => {
+          const url = window.location.origin;
+          const data = { title: "Pockity", text: "Track your income and expenses with Pockity.", url };
+          try {
+            if (navigator.share) { await navigator.share(data); return; }
+            await navigator.clipboard.writeText(url);
+            toast.success("Link copied to clipboard");
+          } catch (e) {
+            if (e instanceof Error && e.name === "AbortError") return;
+            try { await navigator.clipboard.writeText(url); toast.success("Link copied to clipboard"); }
+            catch { toast.error("Couldn't share the link"); }
+          }
+        }}><Share2 className="h-4 w-4" /> Share app</Button>
       </Card>
       <Card className="max-w-lg">
         <p className="font-semibold">Session</p>

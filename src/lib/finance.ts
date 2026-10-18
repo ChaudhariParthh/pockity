@@ -17,6 +17,7 @@ export const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-IN", { 
 
 export const txnsQuery = queryOptions({
   queryKey: ["transactions"],
+  staleTime: 30_000,
   queryFn: async (): Promise<Txn[]> => {
     const { data, error } = await supabase.from("transactions").select("id,description,amount,type,category,date").order("date", { ascending: false });
     if (error) throw error;
@@ -29,6 +30,21 @@ export function useAddTxn() {
   return useMutation({
     mutationFn: async (t: NewTxn) => {
       const { error } = await supabase.from("transactions").insert(t);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["transactions"] }),
+  });
+}
+
+export function useUpdateTxn() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (t: Pick<Txn, "id"> & Partial<NewTxn>) => {
+      const { id, ...fields } = t;
+      if (fields.description !== undefined && (!fields.description.trim() || fields.description.length > 100)) throw new Error("Invalid description");
+      if (fields.amount !== undefined && (!(fields.amount > 0) || fields.amount > 1e9)) throw new Error("Invalid amount");
+      if (fields.category !== undefined && ![...EXPENSE_CATS, ...INCOME_CATS].includes(fields.category)) throw new Error("Invalid category");
+      const { error } = await supabase.from("transactions").update(fields).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["transactions"] }),
