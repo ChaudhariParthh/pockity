@@ -41,6 +41,7 @@ function AuthPage() {
   const dest = safeRedirect(search.redirect);
 
   useEffect(() => {
+    setConfirm("");
     const go = () => navigate({ to: dest, replace: true });
     supabase.auth.getSession().then(({ data }) => data.session && go());
     const { data } = supabase.auth.onAuthStateChange((e, s) => { if (e === "SIGNED_IN" && s) go(); });
