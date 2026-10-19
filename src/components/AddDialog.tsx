@@ -48,7 +48,7 @@ export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
           <Tabs value={type} onValueChange={(v) => { const t = v as "income" | "expense"; setType(t); setCategoryTouched(false); setCategory(suggestCategory(description, t) ?? (t === "income" ? "Salary" : "Food")); }}>
             <TabsList className="w-full"><TabsTrigger value="expense" className="flex-1">Expense</TabsTrigger><TabsTrigger value="income" className="flex-1">Income</TabsTrigger></TabsList>
           </Tabs>
-          <div className="grid gap-1.5"><Label htmlFor="d">Description</Label><Input id="d" maxLength={100} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Groceries" /></div>
+          <div className="grid gap-1.5"><Label htmlFor="d">Description</Label><Input id="d" maxLength={100} value={description} onChange={(e) => onDescriptionChange(e.target.value)} placeholder="e.g. Groceries" /></div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5"><Label htmlFor="a">Amount (₹)</Label><Input id="a" type="number" min="0" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
             <div className="grid gap-1.5"><Label htmlFor="dt">Date</Label><Input id="dt" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
