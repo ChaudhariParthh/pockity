@@ -15,7 +15,8 @@ export const ICONS: Record<string, typeof Utensils> = {
 /** Keyword map used to guess a category from a transaction description. */
 const CATEGORY_KEYWORDS: [string, string[]][] = [
   ["Food", ["food", "grocer", "restaurant", "cafe", "coffee", "pizza", "burger", "swiggy", "zomato", "lunch", "dinner", "breakfast", "snack", "bakery", "domino", "kfc", "mcdonald", "meal", "eat", "chai", "tea"]],
-  ["Transport", ["uber", "ola", "rapido", "taxi", "cab", "fuel", "petrol", "diesel", "metro", "bus", "train", "flight", "irctc", "parking", "toll", "auto", "ride", "travel", "ticket"]],
+  ["Transport", ["uber", "ola ", "rapido", "taxi", "cab", "fuel", "petrol", "diesel", "metro", "bus ", "train", "flight", "irctc", "parking", "toll", "auto ", "ride", "travel"]],
+  ["Entertainment", ["movie", "cinema", "pvr", "inox", "game", "gaming", "concert", "show", "bookmyshow", "party", "outing", "fun", "ticket"]],
   ["Shopping", ["amazon", "flipkart", "myntra", "ajio", "shopping", "clothes", "shoes", "mall", "store", "purchase", "buy", "order", "fashion", "electronics", "gadget"]],
   ["Bills", ["bill", "electricity", "water", "gas", "recharge", "mobile", "broadband", "wifi", "internet", "dth", "utility", "postpaid", "prepaid", "jio", "airtel", "vi "]],
   ["Entertainment", ["movie", "cinema", "pvr", "inox", "game", "gaming", "concert", "show", "bookmyshow", "party", "outing", "fun"]],
