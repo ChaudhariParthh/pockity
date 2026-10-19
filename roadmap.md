@@ -1,0 +1,2 @@
+- [ ] Implement local context-aware categorization and updated income options without changing appearance or schema.
+- [ ] Test matching, manual corrections, type switching, legacy compatibility, and saving through the app.

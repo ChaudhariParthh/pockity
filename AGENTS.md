@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep category lists, local matching, and selection-resolution rules in the browser-safe categorization utility so forms and tests share one source of truth.
+- Accept legacy income labels when editing historical transactions, but offer current labels for new transactions, to preserve saved data without schema migrations.

@@ -1,46 +1,16 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Utensils, Bus, ShoppingBag, Receipt, Film, Home, Briefcase, Laptop, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isValidCategory } from "@/lib/categorization";
+export { EXPENSE_CATS, INCOME_CATS, suggestCategory } from "@/lib/categorization";
 
 export type Txn = { id: string; description: string; amount: number; type: "income" | "expense"; category: string; date: string };
 export type NewTxn = Omit<Txn, "id">;
 
-export const EXPENSE_CATS = ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Healthcare", "Education", "Housing", "Personal Care", "Subscriptions", "Other"];
-export const INCOME_CATS = ["Salary", "Freelance", "Business", "Investments", "Other"];
 export const ICONS: Record<string, typeof Utensils> = {
   Food: Utensils, Transport: Bus, Shopping: ShoppingBag, Bills: Receipt, Entertainment: Film, Housing: Home,
-  Subscriptions: Sparkles, Salary: Briefcase, Freelance: Laptop,
+  Subscriptions: Sparkles, Salary: Briefcase, Freelance: Laptop, Freelancing: Laptop,
 };
-
-/** Keyword map used to guess a category from a transaction description. */
-const CATEGORY_KEYWORDS: [string, string[]][] = [
-  ["Food", ["food", "grocer", "restaurant", "cafe", "coffee", "pizza", "burger", "swiggy", "zomato", "lunch", "dinner", "breakfast", "snack", "bakery", "domino", "kfc", "mcdonald", "meal", "eat", "chai", "tea"]],
-  ["Transport", ["uber", "ola ", "rapido", "taxi", "cab", "fuel", "petrol", "diesel", "metro", "bus ", "train", "flight", "irctc", "parking", "toll", "auto ", "ride", "travel"]],
-  ["Entertainment", ["movie", "cinema", "pvr", "inox", "game", "gaming", "concert", "show", "bookmyshow", "party", "outing", "fun", "ticket"]],
-  ["Shopping", ["amazon", "flipkart", "myntra", "ajio", "shopping", "clothes", "shoes", "mall", "store", "purchase", "buy", "order", "fashion", "electronics", "gadget"]],
-  ["Bills", ["bill", "electricity", "water", "gas", "recharge", "mobile", "broadband", "wifi", "internet", "dth", "utility", "postpaid", "prepaid", "jio", "airtel", "vi "]],
-  ["Healthcare", ["doctor", "hospital", "medicine", "pharmacy", "medical", "clinic", "dentist", "health", "apollo", "lab", "test", "gym", "fitness"]],
-  ["Education", ["course", "udemy", "coursera", "book", "tuition", "school", "college", "exam", "fee", "class", "learn", "study"]],
-  ["Housing", ["rent", "house", "flat", "apartment", "maintenance", "society", "mortgage", "hostel", "pg "]],
-  ["Personal Care", ["salon", "haircut", "spa", "barber", "beauty", "cosmetic", "skincare", "parlour", "parlor"]],
-  ["Subscriptions", ["netflix", "spotify", "prime", "hotstar", "youtube", "subscription", "sub ", "apple music", "zee5", "sonyliv", "membership", "icloud", "chatgpt"]],
-  ["Salary", ["salary", "payroll", "wage", "paycheck", "stipend"]],
-  ["Freelance", ["freelance", "upwork", "fiverr", "client", "invoice", "gig"]],
-  ["Business", ["business", "sale", "revenue", "profit", "shop income"]],
-  ["Investments", ["dividend", "interest", "mutual fund", "stock", "share", "sip", "investment", "returns", "fd ", "rd "]],
-];
-
-/** Guess the best category for a description + type. Returns undefined when nothing matches. */
-export function suggestCategory(description: string, type: "income" | "expense"): string | undefined {
-  const text = description.toLowerCase();
-  if (!text.trim()) return undefined;
-  const cats = type === "income" ? INCOME_CATS : EXPENSE_CATS;
-  for (const [cat, words] of CATEGORY_KEYWORDS) {
-    if (!cats.includes(cat)) continue;
-    if (words.some((w) => text.includes(w))) return cat;
-  }
-  return undefined;
-}
 
 export const inr = (n: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
 export const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -59,6 +29,7 @@ export function useAddTxn() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (t: NewTxn) => {
+      if (!isValidCategory(t.category, t.type)) throw new Error("Invalid category");
       const { error } = await supabase.from("transactions").insert(t);
       if (error) throw error;
     },
@@ -73,7 +44,9 @@ export function useUpdateTxn() {
       const { id, ...fields } = t;
       if (fields.description !== undefined && (!fields.description.trim() || fields.description.length > 100)) throw new Error("Invalid description");
       if (fields.amount !== undefined && (!(fields.amount > 0) || fields.amount > 1e9)) throw new Error("Invalid amount");
-      if (fields.category !== undefined && ![...EXPENSE_CATS, ...INCOME_CATS].includes(fields.category)) throw new Error("Invalid category");
+      if (fields.category !== undefined && !(fields.type
+        ? isValidCategory(fields.category, fields.type, true)
+        : isValidCategory(fields.category, "income", true) || isValidCategory(fields.category, "expense"))) throw new Error("Invalid category");
       const { error } = await supabase.from("transactions").update(fields).eq("id", id);
       if (error) throw error;
     },
