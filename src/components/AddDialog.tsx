@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EXPENSE_CATS, INCOME_CATS, useAddTxn } from "@/lib/finance";
+import { EXPENSE_CATS, INCOME_CATS, suggestCategory, useAddTxn } from "@/lib/finance";
 
 export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const [type, setType] = useState<"income" | "expense">("expense");
