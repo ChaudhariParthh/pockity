@@ -54,7 +54,7 @@ export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
             <div className="grid gap-1.5"><Label htmlFor="dt">Date</Label><Input id="dt" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
           </div>
           <div className="grid gap-1.5"><Label>Category</Label>
-            <Select value={category} onValueChange={setCategory}><SelectTrigger aria-label="Category"><SelectValue /></SelectTrigger><SelectContent>{cats.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
+            <Select value={category} onValueChange={(v) => { setCategoryTouched(true); setCategory(v); }}><SelectTrigger aria-label="Category"><SelectValue /></SelectTrigger><SelectContent>{cats.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
