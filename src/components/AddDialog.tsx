@@ -34,7 +34,7 @@ export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
     try {
       await add.mutateAsync({ description: description.trim(), amount: Math.round(amt * 100) / 100, type, category, date });
       toast.success("Transaction added");
-      setDescription(""); setAmount(""); setError(""); onOpenChange(false);
+      setDescription(""); setAmount(""); setError(""); setCategoryTouched(false); onOpenChange(false);
     } catch {
       setError("Couldn't save the transaction. Please try again.");
     }
