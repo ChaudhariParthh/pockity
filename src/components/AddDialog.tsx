@@ -15,8 +15,17 @@ export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
   const [category, setCategory] = useState("Food");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [error, setError] = useState("");
+  const [categoryTouched, setCategoryTouched] = useState(false);
   const add = useAddTxn();
   const cats = type === "income" ? INCOME_CATS : EXPENSE_CATS;
+
+  const onDescriptionChange = (value: string) => {
+    setDescription(value);
+    if (!categoryTouched) {
+      const guess = suggestCategory(value, type);
+      if (guess) setCategory(guess);
+    }
+  };
 
   const submit = async () => {
     const amt = Number(amount);
