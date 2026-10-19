@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EXPENSE_CATS, INCOME_CATS, useUpdateTxn, type Txn } from "@/lib/finance";
+import { isValidCategory } from "@/lib/categorization";
 
 export function EditDialog({ txn, onClose }: { txn: Txn | null; onClose: () => void }) {
   const [description, setDescription] = useState("");
@@ -25,13 +26,15 @@ export function EditDialog({ txn, onClose }: { txn: Txn | null; onClose: () => v
     }
   }, [txn]);
 
-  const cats = txn?.type === "income" ? INCOME_CATS : EXPENSE_CATS;
+  const options = txn?.type === "income" ? INCOME_CATS : EXPENSE_CATS;
+  const cats = txn && isValidCategory(txn.category, txn.type, true) && !options.includes(txn.category) ? [...options, txn.category] : options;
 
   const submit = async () => {
     if (!txn) return;
     const amt = Number(amount);
     if (!description.trim() || description.length > 100) return setError("Enter a description (max 100 characters).");
     if (!(amt > 0) || amt > 1e9) return setError("Amount must be a positive number.");
+    if (!isValidCategory(category, txn.type, true)) return setError("Select a valid category.");
     try {
       await update.mutateAsync({ id: txn.id, description: description.trim(), amount: Math.round(amt * 100) / 100, category, date });
       toast.success("Transaction updated");
