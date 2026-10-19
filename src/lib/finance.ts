@@ -19,7 +19,6 @@ const CATEGORY_KEYWORDS: [string, string[]][] = [
   ["Entertainment", ["movie", "cinema", "pvr", "inox", "game", "gaming", "concert", "show", "bookmyshow", "party", "outing", "fun", "ticket"]],
   ["Shopping", ["amazon", "flipkart", "myntra", "ajio", "shopping", "clothes", "shoes", "mall", "store", "purchase", "buy", "order", "fashion", "electronics", "gadget"]],
   ["Bills", ["bill", "electricity", "water", "gas", "recharge", "mobile", "broadband", "wifi", "internet", "dth", "utility", "postpaid", "prepaid", "jio", "airtel", "vi "]],
-  ["Entertainment", ["movie", "cinema", "pvr", "inox", "game", "gaming", "concert", "show", "bookmyshow", "party", "outing", "fun"]],
   ["Healthcare", ["doctor", "hospital", "medicine", "pharmacy", "medical", "clinic", "dentist", "health", "apollo", "lab", "test", "gym", "fitness"]],
   ["Education", ["course", "udemy", "coursera", "book", "tuition", "school", "college", "exam", "fee", "class", "learn", "study"]],
   ["Housing", ["rent", "house", "flat", "apartment", "maintenance", "society", "mortgage", "hostel", "pg "]],
