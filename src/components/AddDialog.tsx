@@ -45,7 +45,7 @@ export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
       <DialogContent>
         <DialogHeader><DialogTitle>Add transaction</DialogTitle></DialogHeader>
         <div className="grid gap-4">
-          <Tabs value={type} onValueChange={(v) => { setType(v as "income" | "expense"); setCategory(v === "income" ? "Salary" : "Food"); }}>
+          <Tabs value={type} onValueChange={(v) => { const t = v as "income" | "expense"; setType(t); setCategoryTouched(false); setCategory(suggestCategory(description, t) ?? (t === "income" ? "Salary" : "Food")); }}>
             <TabsList className="w-full"><TabsTrigger value="expense" className="flex-1">Expense</TabsTrigger><TabsTrigger value="income" className="flex-1">Income</TabsTrigger></TabsList>
           </Tabs>
           <div className="grid gap-1.5"><Label htmlFor="d">Description</Label><Input id="d" maxLength={100} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Groceries" /></div>
