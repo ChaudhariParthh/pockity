@@ -11,6 +11,8 @@ export const Route = createFileRoute("/_authenticated/analytics")({
       { name: "description", content: "Monthly income vs expenses and top spending categories." },
       { property: "og:title", content: "Analytics — Pockity" },
       { property: "og:description", content: "Monthly income vs expenses and top spending categories." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(txnsQuery),

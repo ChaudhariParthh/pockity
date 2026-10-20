@@ -16,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "description", content: "Your monthly cash flow, income and expenses at a glance." },
       { property: "og:title", content: "Dashboard — Pockity" },
       { property: "og:description", content: "Your monthly cash flow, income and expenses at a glance." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(txnsQuery),
