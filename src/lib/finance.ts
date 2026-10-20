@@ -1,5 +1,5 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Utensils, Bus, ShoppingBag, Receipt, Film, Home, Briefcase, Laptop, Sparkles } from "lucide-react";
+import { Utensils, Bus, ShoppingBag, Receipt, Film, Home, Briefcase, Laptop, Sparkles, ShoppingBasket, Wrench, Plane, HeartPulse, Dumbbell, GraduationCap, Baby, PawPrint, Gift, Landmark, CreditCard, TrendingUp, Shield, Building2, Award, Coins, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { isValidCategory } from "@/lib/categorization";
 export { EXPENSE_CATS, INCOME_CATS, suggestCategory } from "@/lib/categorization";
@@ -10,6 +10,16 @@ export type NewTxn = Omit<Txn, "id">;
 export const ICONS: Record<string, typeof Utensils> = {
   Food: Utensils, Transport: Bus, Shopping: ShoppingBag, Bills: Receipt, Entertainment: Film, Housing: Home,
   Subscriptions: Sparkles, Salary: Briefcase, Freelance: Laptop, Freelancing: Laptop,
+  "Food & Dining": Utensils, Groceries: ShoppingBasket, "Housing & Rent": Home,
+  "Bills & Utilities": Receipt, "Home Maintenance": Wrench, "Transit & Fuel": Bus,
+  "Travel & Trips": Plane, "Healthcare & Pharmacy": HeartPulse, "Fitness & Sports": Dumbbell,
+  Education: GraduationCap, "Family & Kids": Baby, Pets: PawPrint, "Personal Care": Sparkles,
+  "Entertainment & Outings": Film, "Gifts & Donations": Gift, "EMIs & Loans": Landmark,
+  "Credit Card & Banking Fees": CreditCard, "Investments & Savings": TrendingUp, Insurance: Shield,
+  "Taxes & Government": Building2, "Other Expense": Receipt, "Freelancing & Gigs": Laptop,
+  "Business Revenue": Briefcase, "Bonus & Commission": Award, "Investment Returns": TrendingUp,
+  "Rental Income": Home, "Capital Gains & Crypto": Coins, "Cashback & Rewards": Award,
+  "Refunds & Reimbursements": RotateCcw, "Gifts & Grants": Gift, "Other Income": Receipt,
 };
 
 export const inr = (n: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
@@ -46,7 +56,7 @@ export function useUpdateTxn() {
       if (fields.amount !== undefined && (!(fields.amount > 0) || fields.amount > 1e9)) throw new Error("Invalid amount");
       if (fields.category !== undefined && !(fields.type
         ? isValidCategory(fields.category, fields.type, true)
-        : isValidCategory(fields.category, "income", true) || isValidCategory(fields.category, "expense"))) throw new Error("Invalid category");
+        : isValidCategory(fields.category, "income", true) || isValidCategory(fields.category, "expense", true))) throw new Error("Invalid category");
       const { error } = await supabase.from("transactions").update(fields).eq("id", id);
       if (error) throw error;
     },

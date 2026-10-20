@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { name: "description", content: "Manage your Pockity profile and password." },
       { property: "og:title", content: "Settings — Pockity" },
       { property: "og:description", content: "Manage your Pockity profile and password." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SettingsPage,

@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/transactions")({
       { name: "description", content: "Search, add, export and delete your Pockity transactions." },
       { property: "og:title", content: "Transactions — Pockity" },
       { property: "og:description", content: "Search, add, export and delete your Pockity transactions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(txnsQuery),

@@ -10,6 +10,8 @@ export const Route = createFileRoute("/_authenticated/upgrade")({
       { name: "description", content: "Smart insights, budgeting tools and custom reports with Pockity Pro." },
       { property: "og:title", content: "Pockity Pro" },
       { property: "og:description", content: "Smart insights, budgeting tools and custom reports with Pockity Pro." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Upgrade,

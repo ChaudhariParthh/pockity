@@ -4,21 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAddTxn } from "@/lib/finance";
-import { categoriesFor, isValidCategory, resolveCategory, type TransactionType } from "@/lib/categorization";
+import { isValidCategory, resolveCategory, type TransactionType } from "@/lib/categorization";
 
 export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const [type, setType] = useState<"income" | "expense">("expense");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [categories, setCategories] = useState({ expense: "Food", income: "Salary" });
+  const [categories, setCategories] = useState({ expense: "Food & Dining", income: "Salary" });
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [error, setError] = useState("");
   const [categoryTouched, setCategoryTouched] = useState({ expense: false, income: false });
   const add = useAddTxn();
-  const cats = categoriesFor(type);
   const category = categories[type];
 
   const onDescriptionChange = (value: string) => {
@@ -61,7 +60,7 @@ export function AddDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
             <div className="grid gap-1.5"><Label htmlFor="dt">Date</Label><Input id="dt" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
           </div>
           <div className="grid gap-1.5"><Label>Category</Label>
-            <Select value={category} onValueChange={(v) => { if (!isValidCategory(v, type)) return; setCategoryTouched((current) => ({ ...current, [type]: true })); setCategories((current) => ({ ...current, [type]: v })); }}><SelectTrigger aria-label="Category"><SelectValue /></SelectTrigger><SelectContent>{cats.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
+            <CategoryPicker type={type} value={category} onChange={(v) => { setCategoryTouched((current) => ({ ...current, [type]: true })); setCategories((current) => ({ ...current, [type]: v })); }} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>

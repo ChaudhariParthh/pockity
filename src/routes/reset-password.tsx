@@ -13,6 +13,8 @@ export const Route = createFileRoute("/reset-password")({
       { name: "description", content: "Choose a new password for your Pockity account." },
       { property: "og:title", content: "Set a new password — Pockity" },
       { property: "og:description", content: "Choose a new password for your Pockity account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ResetPassword,
