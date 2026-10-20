@@ -1,2 +1,4 @@
 - [x] Implement local context-aware categorization and updated income options without changing appearance or schema.
 - [x] Test matching, manual corrections, type switching, legacy compatibility, and saving through the app (32 tests and signed-in save/readback/edit/delete verified).
+- [ ] Expand grouped expense/income categories, preserve historical labels, and align icons.
+- [ ] Test matching and verify grouped Add/Edit save and readback.
