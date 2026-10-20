@@ -56,7 +56,7 @@ export function useUpdateTxn() {
       if (fields.amount !== undefined && (!(fields.amount > 0) || fields.amount > 1e9)) throw new Error("Invalid amount");
       if (fields.category !== undefined && !(fields.type
         ? isValidCategory(fields.category, fields.type, true)
-        : isValidCategory(fields.category, "income", true) || isValidCategory(fields.category, "expense"))) throw new Error("Invalid category");
+        : isValidCategory(fields.category, "income", true) || isValidCategory(fields.category, "expense", true))) throw new Error("Invalid category");
       const { error } = await supabase.from("transactions").update(fields).eq("id", id);
       if (error) throw error;
     },
