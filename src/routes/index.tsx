@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { BarChart3, ShieldCheck, Wallet } from "lucide-react";
 import logoWhite from "@/assets/pockity-logo-white.png";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,6 +20,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const navigate = useNavigate();
+
+  // Signed-in visitors skip the landing page and go straight to the dashboard.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/dashboard", replace: true });
+    });
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-brand-dark font-sans text-brand-dark-foreground">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
