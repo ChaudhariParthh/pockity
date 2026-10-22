@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppShell, Card } from "@/components/AppShell";
 import { AddDialog } from "@/components/AddDialog";
 import { ICONS, fmtDate, inr, monthlyTrend, txnsQuery, type Txn } from "@/lib/finance";
+import { csvCell } from "@/lib/security";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -25,9 +26,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 export function exportCsv(txns: Txn[]) {
-  const rows = [["Date", "Description", "Type", "Category", "Amount"], ...txns.map((t) => [t.date, `"${t.description.replace(/"/g, '""')}"`, t.type, t.category, String(t.amount)])];
-  const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv" });
+  const rows = [["Date", "Description", "Type", "Category", "Amount"], ...txns.map((t) => [t.date, t.description, t.type, t.category, String(t.amount)])];
+  const blob = new Blob([rows.map((r) => r.map(csvCell).join(",")).join("\r\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "pockity-transactions.csv"; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
 function Dashboard() {

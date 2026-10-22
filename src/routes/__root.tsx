@@ -13,6 +13,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { supabase } from "@/integrations/supabase/client";
+import { clearPrivateCache } from "@/lib/security";
 
 function NotFoundComponent() {
   return (
@@ -125,6 +127,26 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    let identity: string | null | undefined;
+    let active = true;
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      const nextIdentity = session?.user.id ?? null;
+      const changed = identity !== undefined && identity !== nextIdentity;
+      identity = nextIdentity;
+      if (event === "SIGNED_OUT" || changed) void clearPrivateCache(queryClient);
+      if (!["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event) && !changed) return;
+      // Auth callbacks must not await other auth calls; recheck the managed gate afterwards.
+      setTimeout(() => {
+        if (!active) return;
+        void router.invalidate();
+        if (nextIdentity) void queryClient.invalidateQueries();
+      }, 0);
+    });
+    return () => { active = false; data.subscription.unsubscribe(); };
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
