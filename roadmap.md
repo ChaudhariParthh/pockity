@@ -2,3 +2,6 @@
 - [x] Test matching, manual corrections, type switching, legacy compatibility, and saving through the app (32 tests and signed-in save/readback/edit/delete verified).
 - [x] Expand grouped expense/income categories, preserve historical labels, and align icons.
 - [x] Verify 58 tests, signed-in grouped Add/Edit save and readback, manual overrides, and phone-width picker.
+- [ ] Harden sign-in safeguards and clear private data on session/identity changes.
+- [ ] Fix vulnerable dependencies, transaction validation, export safety, and response protections.
+- [ ] Verify security regressions and signed-in transaction/session-loss flows.
