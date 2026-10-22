@@ -40,6 +40,7 @@ function SettingsPage() {
     router.invalidate();
   };
   const savePw = async () => {
+    if (!current) { toast.error("Enter your current password."); return; }
     if (pw.length < 8) { toast.error("Password must be at least 8 characters."); return; }
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw, current_password: current } as Parameters<typeof supabase.auth.updateUser>[0]);

@@ -1,7 +1,8 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Utensils, Bus, ShoppingBag, Receipt, Film, Home, Briefcase, Laptop, Sparkles, ShoppingBasket, Wrench, Plane, HeartPulse, Dumbbell, GraduationCap, Baby, PawPrint, Gift, Landmark, CreditCard, TrendingUp, Shield, Building2, Award, Coins, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { isValidCategory } from "@/lib/categorization";
+import { transactionSchema, transactionUpdateSchema, transactionIdSchema } from "@/lib/security";
+export { safeRedirect } from "@/lib/security";
 export { EXPENSE_CATS, INCOME_CATS, suggestCategory } from "@/lib/categorization";
 
 export type Txn = { id: string; description: string; amount: number; type: "income" | "expense"; category: string; date: string };
@@ -28,8 +29,8 @@ export const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-IN", { 
 export const txnsQuery = queryOptions({
   queryKey: ["transactions"],
   staleTime: 30_000,
-  queryFn: async (): Promise<Txn[]> => {
-    const { data, error } = await supabase.from("transactions").select("id,description,amount,type,category,date").order("date", { ascending: false });
+  queryFn: async ({ signal }): Promise<Txn[]> => {
+    const { data, error } = await supabase.from("transactions").select("id,description,amount,type,category,date").order("date", { ascending: false }).abortSignal(signal);
     if (error) throw error;
     return (data ?? []).map((r) => ({ ...r, amount: Number(r.amount), type: r.type as Txn["type"] }));
   },
@@ -39,8 +40,8 @@ export function useAddTxn() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (t: NewTxn) => {
-      if (!isValidCategory(t.category, t.type)) throw new Error("Invalid category");
-      const { error } = await supabase.from("transactions").insert(t);
+      const fields = transactionSchema.parse(t);
+      const { error } = await supabase.from("transactions").insert(fields);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["transactions"] }),
@@ -51,13 +52,14 @@ export function useUpdateTxn() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (t: Pick<Txn, "id"> & Partial<NewTxn>) => {
-      const { id, ...fields } = t;
-      if (fields.description !== undefined && (!fields.description.trim() || fields.description.length > 100)) throw new Error("Invalid description");
-      if (fields.amount !== undefined && (!(fields.amount > 0) || fields.amount > 1e9)) throw new Error("Invalid amount");
-      if (fields.category !== undefined && !(fields.type
-        ? isValidCategory(fields.category, fields.type, true)
-        : isValidCategory(fields.category, "income", true) || isValidCategory(fields.category, "expense", true))) throw new Error("Invalid category");
-      const { error } = await supabase.from("transactions").update(fields).eq("id", id);
+      const { id, ...fields } = transactionUpdateSchema.parse(t);
+      const updates: Partial<NewTxn> = {};
+      if (fields.description !== undefined) updates.description = fields.description;
+      if (fields.amount !== undefined) updates.amount = fields.amount;
+      if (fields.category !== undefined) updates.category = fields.category;
+      if (fields.type !== undefined) updates.type = fields.type;
+      if (fields.date !== undefined) updates.date = fields.date;
+      const { error } = await supabase.from("transactions").update(updates).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["transactions"] }),
@@ -68,7 +70,7 @@ export function useDeleteTxn() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("transactions").delete().eq("id", id);
+      const { error } = await supabase.from("transactions").delete().eq("id", transactionIdSchema.parse(id));
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["transactions"] }),
@@ -89,6 +91,3 @@ export function monthlyTrend(txns: Txn[], months = 6, now = new Date()) {
   return out;
 }
 
-export function safeRedirect(path: unknown): string {
-  return typeof path === "string" && path.startsWith("/") && !path.startsWith("//") ? path : "/dashboard";
-}
