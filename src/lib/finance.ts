@@ -53,7 +53,13 @@ export function useUpdateTxn() {
   return useMutation({
     mutationFn: async (t: Pick<Txn, "id"> & Partial<NewTxn>) => {
       const { id, ...fields } = transactionUpdateSchema.parse(t);
-      const { error } = await supabase.from("transactions").update(fields).eq("id", id);
+      const updates: Partial<NewTxn> = {};
+      if (fields.description !== undefined) updates.description = fields.description;
+      if (fields.amount !== undefined) updates.amount = fields.amount;
+      if (fields.category !== undefined) updates.category = fields.category;
+      if (fields.type !== undefined) updates.type = fields.type;
+      if (fields.date !== undefined) updates.date = fields.date;
+      const { error } = await supabase.from("transactions").update(updates).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["transactions"] }),
