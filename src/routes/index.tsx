@@ -30,7 +30,7 @@ function Landing() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-brand-dark font-sans text-brand-dark-foreground">
+    <div className="flex min-h-screen flex-col bg-brand-dark font-sans text-brand-dark-foreground">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <img src={logoWhite} alt="Pockity" className="h-9 w-auto" />
         <Button asChild variant="secondary"><Link to="/auth">Sign in</Link></Button>
