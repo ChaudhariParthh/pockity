@@ -63,7 +63,7 @@ function Landing() {
       <footer className="mt-auto border-t border-brand-dark-foreground/15">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-1.5 px-6 py-8 text-center">
           <p className="text-sm opacity-70">© {new Date().getFullYear()} Pockity. All rights reserved.</p>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] opacity-50">Developed by Parth</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] opacity-50">Developed by Parth · AI Engineer</p>
         </div>
       </footer>
     </div>
