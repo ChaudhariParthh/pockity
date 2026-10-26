@@ -16,9 +16,9 @@ A modern personal finance tracker designed to help users monitor income, expense
 ## Demo / Screenshots
 <img width="1917" height="1016" alt="image" src="https://github.com/user-attachments/assets/fcc2e27e-10d7-40c0-b0a8-f32c0d9c1731" />
 
-- Live Demo: [https://pockity.lovable.app](https://pockity.lovable.app)
-- Live Demo Video : [https://drive.google.com/file/d/1Qzwx2xMA8marD5SQY3NHVXWPqMIKuvwB/view?usp=sharing]
-- GitHub Repository: [https://github.com/ChaudhariParthh/pockity](https://github.com/ChaudhariParthh/pockity)
+- [Live Demo](https://pockity.lovable.app)
+- [Live Demo Video](https://drive.google.com/file/d/1Qzwx2xMA8marD5SQY3NHVXWPqMIKuvwB/view?usp=sharing)
+- [GitHub Repository](https://github.com/ChaudhariParthh/pockity)
 
 ## Tech Stack
 
