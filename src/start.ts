@@ -3,6 +3,21 @@ import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/r
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
+// SECURITY: Combined auth middleware that validates server-side auth context.
+// This ensures protected server functions can't be called without a valid session.
+const authMiddleware = createMiddleware({ type: 'function' }).server(async ({ next, context }) => {
+  const ctx = context as { userId?: string; claims?: Record<string, unknown> } | undefined;
+  const userId = ctx?.userId;
+  const claims = ctx?.claims;
+
+  if (!userId) {
+    throw new Error('Unauthorized: Authentication required');
+  }
+
+  // Proceed to next handler with validated auth context
+  return next(context);
+});
+
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
     return await next();
@@ -26,6 +41,6 @@ const csrfMiddleware = createCsrfMiddleware({
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [attachSupabaseAuth, authMiddleware],
   requestMiddleware: [errorMiddleware, csrfMiddleware],
 }));

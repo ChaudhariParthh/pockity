@@ -8,11 +8,25 @@ function isNewSupabaseApiKey(value: string): boolean {
 }
 
 // The public URL can be reachable only from the browser, so server requests go to the runtime URL of the same backend.
+// SECURITY: Only enable server URL redirection in production when running inside a managed environment.
+// In development, use direct API calls to avoid localhost redirect issues.
+const IS_PRODUCTION = typeof import.meta.env !== 'undefined' && import.meta.env.MODE === 'production';
 function serverSupabaseUrl(publicUrl: string, supabaseKey: string): string | undefined {
-  if (typeof window !== 'undefined' || typeof process === 'undefined') return undefined;
-  const serverUrl = process.env['SUPABASE_URL']?.replace(/\/+$/, '');
-  if (!serverUrl || serverUrl === publicUrl || process.env['SUPABASE_PUBLISHABLE_KEY'] !== supabaseKey) return undefined;
-  return serverUrl;
+  // In browser-only environments (client-side), check for server URL redirect
+  // Only redirect when: production, keys match, and server URL differs from public
+  if (typeof window === 'undefined') return undefined;
+
+  // When build-time env vars are available (production builds via Lovable),
+  // VITE_SUPABASE_URL resolves to the runtime URL
+  const viteSupabaseUrl = typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_SUPABASE_URL : undefined;
+  const viteSupabaseKey = typeof import.meta !== 'undefined' ? (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY : undefined;
+
+  // Use runtime URL when it differs from the public URL (indicates managed backend)
+  if (viteSupabaseUrl && viteSupabaseUrl !== publicUrl && viteSupabaseKey === supabaseKey && IS_PRODUCTION) {
+    return viteSupabaseUrl.replace(/\/+$/, '');
+  }
+
+  return undefined;
 }
 
 function createSupabaseFetch(supabaseUrl: string, supabaseKey: string): typeof fetch {

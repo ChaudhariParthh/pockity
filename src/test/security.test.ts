@@ -38,11 +38,44 @@ describe("Security safeguards", () => {
     expect(cache.getQueryData(["transactions"])).toBeUndefined();
     expect(cancel.mock.invocationCallOrder[0]).toBeLessThan(clear.mock.invocationCallOrder[0] ?? 0);
   });
+
+  // SECURITY HEADERS TESTS
+  it("adds comprehensive security headers to HTTPS responses", () => {
+    const result = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/settings"));
+
+    // Core security headers
+    expect(result.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(result.headers.get("X-Frame-Options")).toBe("DENY");
+    expect(result.headers.get("X-XSS-Protection")).toBe("1; mode=block");
+    expect(result.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
+    expect(result.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self'");
+    expect(result.headers.get("Permissions-Policy")).toBe("geolocation=(), microphone=(), camera=(), payment=()");
+
+    // HTTPS security
+    expect(result.headers.get("Strict-Transport-Security")).toBe("max-age=31536000; includeSubDomains");
+  });
+
+  it("adds no-cache headers to JSON responses", () => {
+    const result = secureResponse(new Response('{"data":"sensitive"}', { headers: { "content-type": "application/json" } }), new Request("http://localhost:5173/api/data"));
+
+    // Cache prevention
+    expect(result.headers.get("Cache-Control")).toBe("private, no-store, no-cache, must-revalidate");
+    expect(result.headers.get("Pragma")).toBe("no-cache");
+  });
+
+  it("adds security headers without HSTS on HTTP (non-HTTPS) requests", () => {
+    const result = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("http://localhost:5173/dashboard"));
+
+    // HTTP should NOT have HSTS
+    expect(result.headers.get("Strict-Transport-Security")).toBeNull();
+    // But other security headers should be present
+    expect(result.headers.get("X-Content-Type-Options")).toBe("nosniff");
+  });
+
   it("protects HTML from caching and unsafe content interpretation", () => {
     const result = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/settings"));
-    expect(result.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(result.headers.get("Cache-Control")).toBe("private, no-store, no-cache, must-revalidate");
     expect(result.headers.get("X-Content-Type-Options")).toBe("nosniff");
-    expect(result.headers.get("Strict-Transport-Security")).toBe("max-age=31536000");
-    expect(result.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'");
+    expect(result.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self'");
   });
 });

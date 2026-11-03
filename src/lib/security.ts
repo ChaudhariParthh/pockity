@@ -41,12 +41,30 @@ export function clearPrivateCache(cache: { cancelQueries: () => Promise<unknown>
 
 export function secureResponse(response: Response, request: Request): Response {
   const headers = new Headers(response.headers);
+
+  // SECURITY HEADERS
+  // Prevent MIME type sniffing attacks
   headers.set("X-Content-Type-Options", "nosniff");
+  // Prevent clickjacking attacks
+  headers.set("X-Frame-Options", "DENY");
+  // Reduce referrer information leakage
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set("Content-Security-Policy", "base-uri 'self'; object-src 'none'");
-  if (new URL(request.url).protocol === "https:") headers.set("Strict-Transport-Security", "max-age=31536000");
-  if (headers.get("content-type")?.includes("text/html") || new URL(request.url).pathname.startsWith("/_serverFn")) {
-    headers.set("Cache-Control", "private, no-store");
+  // Content Security Policy - restrict resource loading
+  headers.set("Content-Security-Policy", "base-uri 'self'; object-src 'none'; script-src 'self'");
+  // XSS Protection (legacy browsers)
+  headers.set("X-XSS-Protection", "1; mode=block");
+  // Permissions Policy - restrict browser features
+  headers.set("Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=()");
+
+  // HTTPS-only hosts should always use HSTS
+  if (new URL(request.url).protocol === "https:") headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+  // Prevent caching of sensitive content
+  const contentType = headers.get("content-type")?.toLowerCase() || "";
+  if (contentType.includes("text/html") || new URL(request.url).pathname.startsWith("/_serverFn") || contentType.includes("application/json")) {
+    headers.set("Cache-Control", "private, no-store, no-cache, must-revalidate");
+    headers.set("Pragma", "no-cache");
   }
+
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }

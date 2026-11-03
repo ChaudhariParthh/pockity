@@ -30,3 +30,74 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# --- SECURITY: secrets, credentials, and local-only config ---
+# All environment files that may hold real credentials.
+.env
+.env.*
+!.env.example
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+
+# Local-only Supabase / cloud config that may carry live credentials.
+supabase/.env
+supabse/.env
+# NOTE: supabase/config.toml is intentionally tracked — it only holds the public
+# project_id, never a secret key. If you add real credentials to it, ignore it.
+
+# Key / cert / credential material.
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+*.crt
+*.cer
+*.der
+*.ppk
+id_rsa*
+id_ed25519*
+*.ppu
+*.sbn
+
+# Cloud provider credentials and service account keys.
+.aws/
+.gcp/
+*.serviceaccount.json
+*credentials*.json
+*secrets*.json
+*.kubeconfig
+
+# Database dumps, backups, and local data.
+# (Drizzle migration .sql files are tracked source — not ignored.)
+*.sql.gz
+*.dump
+*.backup
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+drizzle/.data
+drizzle/*.db
+
+# Session / auth tokens and debug artifacts.
+*.session
+*.token
+*.jwt
+*.auth
+*.sensitive
+*.secret
+*.credentials
+
+# Build artifacts and local tooling.
+*.log.gz
+*.tsbuildinfo
+*.coverage
+.coverage.*
+htmlcov/
+.DS_Store
+Thumbs.db
