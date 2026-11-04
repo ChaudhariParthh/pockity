@@ -64,7 +64,11 @@ export function secureResponse(response: Response, request: Request): Response {
     : "https://nuvapxtjwxicqlwixhdi.supabase.co";
   const csp = isDev
     ? "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;"
-    : "base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;";
+    // TanStack Router SSR injects inline <script> tags for hydration data
+    // (data-tsr-stream-part / window.$_TSR) and the root route injects an inline
+    // theme-init script. Without 'unsafe-inline' the browser blocks them, so
+    // client hydration never starts and the page renders blank.
+    : "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;";
   headers.set("Content-Security-Policy", csp);
 
   // HTTPS-only hosts should always use HSTS

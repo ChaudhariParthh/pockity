@@ -83,10 +83,13 @@ describe("Security safeguards", () => {
   it("uses strict CSP in production and relaxed CSP in development", () => {
     const original = process.env['NODE_ENV'];
 
-    // Production: strict CSP
+    // Production: strict CSP. 'unsafe-inline' is required because TanStack Router
+    // SSR injects inline hydration scripts (data-tsr-stream-part / window.$_TSR)
+    // and the root route injects an inline theme-init script; without it the
+    // browser blocks them and client hydration never starts (blank page).
     process.env['NODE_ENV'] = 'production';
     const prodResult = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/"));
-    expect(prodResult.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self'");
+    expect(prodResult.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://nuvapxtjwxicqlwixhdi.supabase.co; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;");
 
     // Development: relaxed CSP for Vite HMR
     process.env['NODE_ENV'] = 'development';
