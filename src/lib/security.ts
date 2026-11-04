@@ -57,10 +57,14 @@ export function secureResponse(response: Response, request: Request): Response {
   // Content Security Policy
   // In development, Vite uses inline scripts and dynamic imports (HMR, dev server),
   // so we relax the script-src to allow them. In production, strict CSP is enforced.
+  // Both environments need connect-src for Supabase API calls and font-src for Google Fonts.
   const isDev = typeof process !== 'undefined' && process.env['NODE_ENV'] !== 'production';
+  const supabaseUrl = new URL(request.url).origin.includes("localhost")
+    ? "https://nuvapxtjwxicqlwixhdi.supabase.co"
+    : "https://nuvapxtjwxicqlwixhdi.supabase.co";
   const csp = isDev
-    ? "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
-    : "base-uri 'self'; object-src 'none'; script-src 'self'";
+    ? "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;"
+    : "base-uri 'self'; object-src 'none'; script-src 'self'; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;";
   headers.set("Content-Security-Policy", csp);
 
   // HTTPS-only hosts should always use HSTS
