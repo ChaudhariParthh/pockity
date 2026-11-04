@@ -1,0 +1,17 @@
+import { chromium } from 'playwright';
+const CHROME_PATH = 'C:/Users/parth/.cache/puppeteer/chrome/win64-156.0.8078.47/chrome-win64/chrome.exe';
+const browser = await chromium.launch({ executablePath: CHROME_PATH, headless: true, args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'] });
+const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+const errors = [];
+page.on('console', m => { if (m.type()==='error') errors.push('CONSOLE: '+m.text()); });
+page.on('pageerror', e => errors.push('PAGEERROR: '+e.message));
+await page.goto('http://127.0.0.1:5176/', { waitUntil: 'load', timeout: 20000 });
+await page.waitForTimeout(2000);
+const text = await page.locator('body').innerText();
+await page.screenshot({ path: './noenv_probe.png' });
+await browser.close();
+console.log('hasContent:', text.replace(/\s/g,'').length > 20);
+console.log('bodyText length:', text.length);
+console.log('bodyText preview:', text.slice(0,400));
+console.log('=== error count:', errors.length, '===');
+errors.slice(0,10).forEach(e => console.log(e));
