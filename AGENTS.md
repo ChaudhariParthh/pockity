@@ -15,3 +15,4 @@
 - Handle identity transitions once in the root auth subscriber, cancelling requests and clearing private query data before revalidating the managed route gate, so expired or switched sessions cannot reuse cached finances.
 - Validate transaction writes with strict browser-safe schemas and database constraints; keep owner-scoped RLS as the authority, so bypassing forms cannot bypass data protection.
 - Encode every CSV cell with formula neutralization and apply baseline security/no-store headers centrally to server responses, so all exports and pages share the safeguards.
+- Derive CSP backend connections from the browser's configured public URL; permit only trusted Lovable editor framing on preview hosts and deny production framing, so security headers do not block app loading.

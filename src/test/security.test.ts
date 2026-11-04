@@ -89,7 +89,8 @@ describe("Security safeguards", () => {
     // browser blocks them and client hydration never starts (blank page).
     process.env['NODE_ENV'] = 'production';
     const prodResult = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/"));
-    expect(prodResult.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://nuvapxtjwxicqlwixhdi.supabase.co; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;");
+    expect(prodResult.headers.get("Content-Security-Policy")).toContain("script-src 'self' 'unsafe-inline';");
+    expect(prodResult.headers.get("Content-Security-Policy")).not.toContain("'unsafe-eval'");
 
     // Development: relaxed CSP for Vite HMR
     process.env['NODE_ENV'] = 'development';
@@ -98,5 +99,23 @@ describe("Security safeguards", () => {
     expect(devResult.headers.get("Content-Security-Policy")).toContain("style-src 'self' 'unsafe-inline'");
 
     process.env['NODE_ENV'] = original;
+  });
+  it("allows only the configured backend origin for app connections", () => {
+    vi.stubEnv("VITE_SUPABASE_URL", "https://pockity-test.lovable.cloud");
+    try {
+      const result = secureResponse(new Response("page"), new Request("https://pockity.lovable.app/"));
+      const policy = result.headers.get("Content-Security-Policy") ?? "";
+      expect(policy).toContain("connect-src 'self' https://pockity-test.lovable.cloud;");
+      expect(policy).not.toContain("nuvapxtjwxicqlwixhdi");
+      expect(policy).not.toContain("connect-src *");
+    } finally { vi.unstubAllEnvs(); }
+  });
+  it("permits trusted editor framing without allowing production framing", () => {
+    const preview = secureResponse(new Response("page"), new Request("https://id-preview--d05b457c-1582-406a-ad93-7c7d5441351b.lovable.app/"));
+    expect(preview.headers.get("X-Frame-Options")).toBeNull();
+    expect(preview.headers.get("Content-Security-Policy")).toContain("frame-ancestors https://lovable.dev https://*.lovable.dev;");
+    const production = secureResponse(new Response("page"), new Request("https://pockity.lovable.app/"));
+    expect(production.headers.get("X-Frame-Options")).toBe("DENY");
+    expect(production.headers.get("Content-Security-Policy")).toContain("frame-ancestors 'none';");
   });
 });

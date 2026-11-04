@@ -5,3 +5,4 @@
 - [x] Harden sign-in safeguards and clear private data on session/identity changes.
 - [x] Fix vulnerable dependencies, transaction validation, export safety, and response protections.
 - [x] Verify 67 regression tests, signed-in add/edit/export/delete, cross-tab sign-out, anonymous denial, ownership spoof denial, input bounds, and response headers; basic security checks pass (not a full penetration test).
+- [ ] Fix page-loading failures caused by blocked app connections and verify signed-in navigation.
