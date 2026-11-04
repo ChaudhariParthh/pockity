@@ -64,7 +64,7 @@ export function secureResponse(response: Response, request: Request): Response {
   const isDev = typeof process !== 'undefined' && process.env['NODE_ENV'] !== 'production';
   // Use the same public backend origin as the browser client, never a stale
   // project URL or a wildcard that would permit arbitrary data destinations.
-  const backendUrl = import.meta.env['VITE_SUPABASE_URL'];
+  const backendUrl = import.meta.env.VITE_SUPABASE_URL;
   const connections = ["'self'"];
   if (backendUrl) {
     const backend = new URL(backendUrl);
