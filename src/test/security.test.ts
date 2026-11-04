@@ -102,6 +102,7 @@ describe("Security safeguards", () => {
   });
   it("allows only the configured backend origin for app connections", () => {
     vi.stubEnv("VITE_SUPABASE_URL", "https://pockity-test.lovable.cloud");
+    vi.stubEnv("NODE_ENV", "production");
     try {
       const result = secureResponse(new Response("page"), new Request("https://pockity.lovable.app/"));
       const policy = result.headers.get("Content-Security-Policy") ?? "";
