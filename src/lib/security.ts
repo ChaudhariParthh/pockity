@@ -46,7 +46,10 @@ export function secureResponse(response: Response, request: Request): Response {
   // Prevent MIME type sniffing attacks
   headers.set("X-Content-Type-Options", "nosniff");
   // Prevent clickjacking attacks
-  headers.set("X-Frame-Options", "DENY");
+  const requestUrl = new URL(request.url);
+  const editorPreview = requestUrl.hostname === "localhost" || /^id-preview(?:-[a-z0-9]+)?--[0-9a-f-]{36}\.lovable\.app$/.test(requestUrl.hostname);
+  if (editorPreview) headers.delete("X-Frame-Options");
+  else headers.set("X-Frame-Options", "DENY");
   // Reduce referrer information leakage
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // XSS Protection (legacy browsers)
@@ -59,17 +62,26 @@ export function secureResponse(response: Response, request: Request): Response {
   // so we relax the script-src to allow them. In production, strict CSP is enforced.
   // Both environments need connect-src for Supabase API calls and font-src for Google Fonts.
   const isDev = typeof process !== 'undefined' && process.env['NODE_ENV'] !== 'production';
-  const supabaseUrl = new URL(request.url).origin.includes("localhost")
-    ? "https://nuvapxtjwxicqlwixhdi.supabase.co"
-    : "https://nuvapxtjwxicqlwixhdi.supabase.co";
+  // Use the same public backend origin as the browser client, never a stale
+  // project URL or a wildcard that would permit arbitrary data destinations.
+  const backendUrl = import.meta.env['VITE_SUPABASE_URL'];
+  const connections = ["'self'"];
+  if (backendUrl) {
+    const backend = new URL(backendUrl);
+    if (backend.protocol === "https:" || (isDev && backend.protocol === "http:")) {
+      connections.push(backend.origin);
+    }
+  }
+  if (isDev) connections.push("ws://localhost:*", "ws://127.0.0.1:*");
+  const connectSrc = connections.join(" ");
   const csp = isDev
-    ? "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;"
+    ? "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src " + connectSrc + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;"
     // TanStack Router SSR injects inline <script> tags for hydration data
     // (data-tsr-stream-part / window.$_TSR) and the root route injects an inline
     // theme-init script. Without 'unsafe-inline' the browser blocks them, so
     // client hydration never starts and the page renders blank.
-    : "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' " + supabaseUrl + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;";
-  headers.set("Content-Security-Policy", csp);
+    : "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src " + connectSrc + "; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: https:;";
+  headers.set("Content-Security-Policy", csp + (editorPreview ? " frame-ancestors https://lovable.dev https://*.lovable.dev;" : " frame-ancestors 'none';"));
 
   // HTTPS-only hosts should always use HSTS
   if (new URL(request.url).protocol === "https:") headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
