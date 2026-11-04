@@ -49,12 +49,19 @@ export function secureResponse(response: Response, request: Request): Response {
   headers.set("X-Frame-Options", "DENY");
   // Reduce referrer information leakage
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  // Content Security Policy - restrict resource loading
-  headers.set("Content-Security-Policy", "base-uri 'self'; object-src 'none'; script-src 'self'");
   // XSS Protection (legacy browsers)
   headers.set("X-XSS-Protection", "1; mode=block");
   // Permissions Policy - restrict browser features
   headers.set("Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=()");
+
+  // Content Security Policy
+  // In development, Vite uses inline scripts and dynamic imports (HMR, dev server),
+  // so we relax the script-src to allow them. In production, strict CSP is enforced.
+  const isDev = typeof process !== 'undefined' && process.env['NODE_ENV'] !== 'production';
+  const csp = isDev
+    ? "base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+    : "base-uri 'self'; object-src 'none'; script-src 'self'";
+  headers.set("Content-Security-Policy", csp);
 
   // HTTPS-only hosts should always use HSTS
   if (new URL(request.url).protocol === "https:") headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");

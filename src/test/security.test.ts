@@ -48,7 +48,6 @@ describe("Security safeguards", () => {
     expect(result.headers.get("X-Frame-Options")).toBe("DENY");
     expect(result.headers.get("X-XSS-Protection")).toBe("1; mode=block");
     expect(result.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
-    expect(result.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self'");
     expect(result.headers.get("Permissions-Policy")).toBe("geolocation=(), microphone=(), camera=(), payment=()");
 
     // HTTPS security
@@ -76,6 +75,25 @@ describe("Security safeguards", () => {
     const result = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/settings"));
     expect(result.headers.get("Cache-Control")).toBe("private, no-store, no-cache, must-revalidate");
     expect(result.headers.get("X-Content-Type-Options")).toBe("nosniff");
-    expect(result.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self'");
+    // CSP is always set; exact value depends on dev vs prod mode
+    expect(result.headers.get("Content-Security-Policy")).toContain("base-uri 'self'");
+    expect(result.headers.get("Content-Security-Policy")).toContain("object-src 'none'");
+  });
+
+  it("uses strict CSP in production and relaxed CSP in development", () => {
+    const original = process.env['NODE_ENV'];
+
+    // Production: strict CSP
+    process.env['NODE_ENV'] = 'production';
+    const prodResult = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/"));
+    expect(prodResult.headers.get("Content-Security-Policy")).toBe("base-uri 'self'; object-src 'none'; script-src 'self'");
+
+    // Development: relaxed CSP for Vite HMR
+    process.env['NODE_ENV'] = 'development';
+    const devResult = secureResponse(new Response("page", { headers: { "content-type": "text/html" } }), new Request("https://pockity.lovable.app/"));
+    expect(devResult.headers.get("Content-Security-Policy")).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
+    expect(devResult.headers.get("Content-Security-Policy")).toContain("style-src 'self' 'unsafe-inline'");
+
+    process.env['NODE_ENV'] = original;
   });
 });

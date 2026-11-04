@@ -2,12 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import logoWhite from "@/assets/pockity-logo-white.png";
+import { GoogleIcon } from "@/components/GoogleIcon";
 import { PasswordInput } from "@/components/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { safeRedirect } from "@/lib/finance";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -78,8 +78,23 @@ function AuthPage() {
   };
 
   const google = async () => {
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (res.error) toast.error("Google sign-in failed. Please try again.");
+    if (busy) return;
+    setBusy(true);
+    try {
+      // Use Supabase's native OAuth flow which works both locally and in production
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/auth",
+        },
+      });
+      if (error) throw error;
+      // OAuth redirect happens; we won't reach here unless there's an error
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -90,7 +105,16 @@ function AuthPage() {
           <h1 className="text-xl font-bold">{mode === "signup" ? "Create your account" : mode === "forgot" ? "Reset your password" : "Welcome back"}</h1>
           {mode !== "forgot" && (
             <>
-              <Button type="button" variant="outline" className="mt-5 w-full" onClick={google}>Continue with Google</Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-5 flex h-10 w-full items-center justify-center gap-2 rounded-md border border-input bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:border-border dark:bg-gray-900 dark:hover:bg-gray-800"
+                onClick={google}
+                disabled={busy}
+              >
+                <GoogleIcon className="h-5 w-5" />
+                Continue with Google
+              </Button>
               <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" /></div>
             </>
           )}

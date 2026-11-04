@@ -2,6 +2,7 @@ import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/r
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+import { corsMiddleware } from "@/lib/cors-middleware";
 
 // SECURITY: Combined auth middleware that validates server-side auth context.
 // This ensures protected server functions can't be called without a valid session.
@@ -42,5 +43,5 @@ const csrfMiddleware = createCsrfMiddleware({
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth, authMiddleware],
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
+  requestMiddleware: [corsMiddleware, errorMiddleware, csrfMiddleware],
 }));
