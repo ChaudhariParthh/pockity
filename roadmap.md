@@ -6,3 +6,4 @@
 - [x] Fix vulnerable dependencies, transaction validation, export safety, and response protections.
 - [x] Verify 67 regression tests, signed-in add/edit/export/delete, cross-tab sign-out, anonymous denial, ownership spoof denial, input bounds, and response headers; basic security checks pass (not a full penetration test).
 - [x] Fix blocked backend connections and trusted preview framing; verify 16 tests, signed-in homepage redirect, saved transactions, all main pages, and mobile refresh without browser errors.
+- [x] Fix published-site "supabaseUrl is required" failure: bake publishable backend settings into the bundle via vite.config.ts fallback defines (publish builds run from a git snapshot without .env); verified live bundle, CSP connect-src, and error-free load of https://pockity.lovable.app.

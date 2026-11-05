@@ -16,3 +16,4 @@
 - Validate transaction writes with strict browser-safe schemas and database constraints; keep owner-scoped RLS as the authority, so bypassing forms cannot bypass data protection.
 - Encode every CSV cell with formula neutralization and apply baseline security/no-store headers centrally to server responses, so all exports and pages share the safeguards.
 - Derive CSP backend connections from the browser's configured public URL; permit only trusted Lovable editor framing on preview hosts and deny production framing, so security headers do not block app loading.
+- Publish builds run from a git snapshot without `.env`, so `vite.config.ts` defines `import.meta.env.VITE_SUPABASE_*` with publishable fallback values (process.env → .env → fallback); never remove these defines or the published bundle loses its backend URL ("supabaseUrl is required").
