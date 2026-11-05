@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { safeRedirect } from "@/lib/finance";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -81,14 +82,8 @@ function AuthPage() {
     if (busy) return;
     setBusy(true);
     try {
-      // Use Supabase's native OAuth flow which works both locally and in production
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/auth",
-        },
-      });
-      if (error) throw error;
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+      if (result.error) throw result.error;
       // OAuth redirect happens; we won't reach here unless there's an error
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
